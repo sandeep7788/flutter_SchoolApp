@@ -6,8 +6,19 @@ import 'package:flutter_applicationdemo08/model/Choice.dart';
 import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
 
 class MainMenuCard extends StatelessWidget {
-  const MainMenuCard({Key key, this.choice}) : super(key: key);
+ /* const MainMenuCard(Choice  choice, Type int, {Key key, this.choice,this.index}) : super(key: key);
+  */
+
+  // MainMenuCard(this.choice,this.index);
+
   final Choice choice;
+  final int index;
+
+  const MainMenuCard({
+    Key key,
+    this.choice,
+    this.index, int int, Choice Choice,
+  }) : super(key: key);
 
   void _navigateToNextScreen(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeworkListScreeen()));
@@ -20,9 +31,9 @@ class MainMenuCard extends StatelessWidget {
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          childAspectRatio: 1,
-          mainAxisSpacing: 2
+            crossAxisCount: 1,
+            childAspectRatio: 1,
+            mainAxisSpacing: 2
 
         ),
         itemBuilder: (contxt, indx) {

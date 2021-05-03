@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
+import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
+import 'package:flutter_applicationdemo08/screens/SignUp.dart';
 
 class Splash extends StatefulWidget {
   _Splash createState() => _Splash();
@@ -11,15 +13,9 @@ class _Splash extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(248, 98, 55, 1.0),
+      backgroundColor: Colors.blueAccent,
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/backgroundimg.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -37,7 +33,7 @@ class _Splash extends State<Splash> {
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
-                      fontFamily: "Mulish",
+                      fontFamily: "intel",
                       fontWeight: FontWeight.w700),
                 )),
           ],
@@ -48,17 +44,30 @@ class _Splash extends State<Splash> {
   }
 
   @override
-  void initState() {
+  Future<void> initState() {
     super.initState();
-    goto();
+    asyncMethod(context);
   }
 }
 
-extension HelpingMethod on _Splash {
-  void goto() async {
-    Timer(
-        Duration(seconds: 2),
-        () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Dashboard())));
+asyncMethod(BuildContext context) async {
+  if (await SharedPreferencesClass.isLogin()) {
+    await dashboardScreen(context);
+  } else {
+    await signUpScreen(context);
   }
+}
+
+void dashboardScreen(BuildContext context) {
+  Timer(
+      Duration(seconds: 2),
+      () => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Dashboard())));
+}
+
+void signUpScreen(BuildContext context) {
+  Timer(
+      Duration(seconds: 2),
+      () => Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => SignUp())));
 }

@@ -2,18 +2,22 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
+import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/list_item_widget/MainMenuCard.dart';
-import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'APIContent.dart';
 import 'model/Choice.dart';
 
 var url = "https://miro.medium.com/max/2160/1*9JzKFil-Xsip742fdxDqZw.jpeg";
+String str_teachername = "Teacher name";
+String str_teacherDes = "d";
 
 class Dashboard extends StatefulWidget {
   _Dashboard createState() => _Dashboard();
 }
 
-Widget _mainAppBar(BuildContext context,String str_teachername) {
-
+Widget _mainAppBar(BuildContext context, String str_teachername) {
   return Container(
     height: 250.0,
     color: Colors.blue,
@@ -21,6 +25,8 @@ Widget _mainAppBar(BuildContext context,String str_teachername) {
       margin: EdgeInsets.only(left: 25),
       child: Center(
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
               backgroundColor: Colors.white,
@@ -30,34 +36,39 @@ Widget _mainAppBar(BuildContext context,String str_teachername) {
                 radius: 50,
               ),
             ),
-            new Center(
-              child: Container(
-                  alignment: Alignment.center,
-                  margin: EdgeInsets.only(left: 25),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          str_teachername,
-                          style: TextStyle(
-                              fontSize: 26,
-                              color: Colors.white70,
-                              fontFamily: 'intel',
-                              decoration: TextDecoration.none),
-                        ),
-                        Text(
-                          "Other Teacher Details",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white60,
-                              fontFamily: 'intel',
-                              decoration: TextDecoration.none),
-                        ),
-                      ],
+            Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(left: 8,right: 8),
+                    child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Text(
+                        str_teachername,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 21,
+                            color: Colors.white70,
+                            fontFamily: 'intel',
+                            decoration: TextDecoration.none),
+                      ),
                     ),
-                  )),
-            )
+                    Container(
+                      margin: EdgeInsets.only(left: 8,right: 8,top: 4),
+                      child: Text(
+                        str_teacherDes,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white60,
+                            fontFamily: 'intel',
+                            decoration: TextDecoration.none),
+                      ),
+                    ),
+                  ]),
+            )))
           ],
         ),
       ),
@@ -65,45 +76,89 @@ Widget _mainAppBar(BuildContext context,String str_teachername) {
   );
 }
 
-Widget _menuList(BuildContext context) {
-  return Container(
-      color: Colors.white,
-      child: GridView.count(
-        crossAxisCount: 2,
-        crossAxisSpacing: 2.0,
-        mainAxisSpacing: 2.0,
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        physics: NeverScrollableScrollPhysics(),
-        children: List.generate(choices.length, (index) {
-          return Center(
-            child: new Column(
-              children: [
-                new Expanded(
-                  child: MainMenuCard(choice: choices[index]),
-                ),
-              ],
-            ),
-          );
-        }),
-      ));
-}
+
 
 class _Dashboard extends State<Dashboard> {
-  String get str_teachername => "Teacher name";
+  Future<void> setDetails() async {
+    str_teachername = await SharedPreferencesClass.get(ApiContent.PREF_name);
+    str_teacherDes =
+        await SharedPreferencesClass.get(ApiContent.PREF_school_name);
+    log.fine(str_teachername + " _ " + str_teacherDes);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(builder: (context, orientation) {
-      return ListView(
-        children: <Widget>[_mainAppBar(context,str_teachername),
-          _menuList(context)],
+      return Container(
+        color: Colors.blue,
+        child: ListView(
+          children: <Widget>[
+            _mainAppBar(context, str_teachername),
+            sliverGridWidget(context)
+          ],
+        ),
       );
     });
   }
+
+  @override
+  Future<void> initState() {
+    super.initState();
+    setDetails();
+  }
+  Widget sliverGridWidget(BuildContext context){
+    return StaggeredGridView.countBuilder(
+      padding: const EdgeInsets.all(8.0),
+      crossAxisCount: 4,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: choices.length,
+      itemBuilder: (context, index){
+        return Card(
+          elevation: 4,
+          margin: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 8.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0.0),
+          ),
+          shadowColor: Colors.blueAccent,
+          color: Colors.white70,
+          child: Container(
+              color: Colors.white,
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    new Expanded(
+                      child: new Container(
+
+                        child: new Icon(
+                          choices[index].icon,
+                          color: Colors.blueAccent,
+                          size: 50.0,
+                        ),
+                      ),
+                      flex: 2,
+                    ),
+                    new Expanded(
+                      child: new Container(
+                          margin: EdgeInsets.only(top: 12),
+                          child: new Text(
+                            choices[index].title,
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          )),
+                      flex: 1,
+                    ),
+                  ])
+          ),
+        );
+      },
+      staggeredTileBuilder: (index) => StaggeredTile.count(2,2.5), //Make size as you want.
+      mainAxisSpacing: 1.0,
+      crossAxisSpacing:1.0,
+    );
+  }
 }
-
-
 
 const List<Choice> choices = const <Choice>[
   const Choice(title: 'Home', icon: Icons.home),

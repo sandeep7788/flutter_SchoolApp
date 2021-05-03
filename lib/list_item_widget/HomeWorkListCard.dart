@@ -3,12 +3,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
-import 'package:flutter_applicationdemo08/model/HomeWorkModel.dart';
+import 'package:flutter_applicationdemo08/models/HomeWorkListModel.dart';
 
 class HomeWorkListCard extends StatelessWidget {
   const HomeWorkListCard({Key key, this.mHomework_model}) : super(key: key);
-
-  final HomeWorkModel mHomework_model;
+  final HomeWorkListModel mHomework_model;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +18,8 @@ class HomeWorkListCard extends StatelessWidget {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
             childAspectRatio: 1,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4),
+            mainAxisSpacing: 1,
+            crossAxisSpacing: 1),
         itemBuilder: (contxt, indx) {
           return GestureDetector(
             child: Card(
@@ -32,7 +31,7 @@ class HomeWorkListCard extends StatelessWidget {
               shadowColor: Colors.blueAccent,
               color: Colors.white70,
               child: Padding(
-                padding: const EdgeInsets.only(top: 25),
+                padding: const EdgeInsets.only(top: 8),
                 child: Container(
                   width: 4,
                   child: Column(

@@ -4,44 +4,183 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_applicationdemo08/APIContent.dart';
 import 'package:flutter_applicationdemo08/common_widget/ListItemWidgets.dart';
+import 'package:flutter_applicationdemo08/common_widget/ProcessDialog.dart';
+import 'package:flutter_applicationdemo08/models/ClassModel.dart';
+import 'package:flutter_applicationdemo08/models/SectionModel.dart';
+import 'package:flutter_applicationdemo08/models/SubjectModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+// import 'package:givegratis/SharedPreference/Dialogs.dart';
 
 var url = "https://miro.medium.com/max/2160/1*9JzKFil-Xsip742fdxDqZw.jpeg";
-var getClassUrl =
-    "http://vidhyalaya.co.in/sspanel/API/holiday/getclasses?school_id=32";
 
 get borderRadius => BorderRadius.circular(8.0);
 TextEditingController str_homework_title = TextEditingController();
 TextEditingController str_homework_description = TextEditingController();
+var classSelected = "Classes";
+var sectionSelected = "Section";
+var subjectSelected = "Subject";
+var dateSelected = "Submission Date";
 File _image;
+List<ClassModel> listClasses = List();
+List<SectionModel> listSection = List();
+List<SubjectModel> listSubject = List();
 
-Future getClassList() async {
-  var uri = Uri.parse(getClassUrl);
-  var response = await http.get(
-    uri,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8'
-    },
-  );
-
-          String arrayText = '[{"name": "dart1","quantity": 12 },{"name": "flutter2","quantity": 25 }]';
-
-          var tagsJson = jsonDecode(arrayText);
-          List<dynamic> tags = tagsJson != null ? List.from(tagsJson) : null;
-
-          print(">> " + tags[0]["name"]);
-          print(">> " + tags[1]["name"]);
-          print(">> " + tags[0]["quantity"].toString());
-          print(">> " + tags[1]["quantity"].toString());
-}
+final GlobalKey<NavigatorState> _keyLoader = new GlobalKey<NavigatorState>();
 
 class AddHomeworkScreen extends StatefulWidget {
   _AddHomeworkScreen createState() => _AddHomeworkScreen();
 }
 
 class _AddHomeworkScreen extends State<AddHomeworkScreen> {
+  Future getClassList(BuildContext context) async {
+    ProcessDialog().showProgressDialog(context, "Please wait ...");
+
+    var uri = Uri.parse(ApiContent.PREF_GET_CLASSES);
+    var response = await http.get(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+    );
+    if (response.statusCode == 200 && response.body.length > 0) {
+      List<dynamic> list = json.decode(response.body);
+
+      for (var i = 0; i < list.length; i++) {
+        ClassModel fact = ClassModel.fromJson(list[i]);
+        listClasses.add(fact);
+      }
+      Navigator.pop(context);
+      if (list.length > 0) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(
+                  "Classes",
+                  style: TextStyle(
+                      fontSize: 24, color: Colors.black, fontFamily: 'intel'),
+                ),
+                content: setupAlertDialoadClassList(
+                    context, listClasses, Icons.class__outlined, 0),
+              );
+            });
+      }
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  Future getSectionList(BuildContext context) async {
+    var uri = Uri.parse(ApiContent.PREF_GET_SECTION);
+    var response = await http.get(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+    );
+    print("@@@@" + response.body);
+
+    if (response.statusCode == 200 && response.body.length > 0) {
+      List<dynamic> list = json.decode(response.body);
+
+      for (var i = 0; i < list.length; i++) {
+        SectionModel fact = SectionModel.fromJson(list[i]);
+        listSection.add(fact);
+      }
+
+      if (list.length > 0) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(
+                  "Section",
+                  style: TextStyle(
+                      fontSize: 24, color: Colors.black, fontFamily: 'intel'),
+                ),
+                content: setupAlertDialoadClassList(
+                    context, listSection, Icons.people_outline_outlined, 1),
+              );
+            });
+      }
+    }
+  }
+
+  Future getSubjectList(BuildContext context) async {
+    var uri = Uri.parse(ApiContent.PREF_GET_SUBJECT);
+    var response = await http.get(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+    );
+    print("@@@@" + response.body);
+
+    if (response.statusCode == 200 && response.body.length > 0) {
+      List<dynamic> list = json.decode(response.body);
+
+      for (var i = 0; i < list.length; i++) {
+        SubjectModel fact = SubjectModel.fromJson(list[i]);
+        listSubject.add(fact);
+      }
+
+      if (list.length > 0) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(
+                  "Section",
+                  style: TextStyle(
+                      fontSize: 24, color: Colors.black, fontFamily: 'intel'),
+                ),
+                content: setupAlertDialoadClassList(
+                    context, listSubject, Icons.book_outlined, 2),
+              );
+            });
+      }
+    }
+  }
+
+  Widget setupAlertDialoadClassList(
+      BuildContext context, List<dynamic> mList, IconData mIconData, int type) {
+    return Container(
+      height: 500.0, // Change as per your requirement
+      width: 300.0, // Change as per your requirement
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: mList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Expanded(
+              child: InkWell(
+            onTap: () {
+              setState(() {
+                if (type == 0) {
+                  classSelected = mList[index].classes;
+                } else if (type == 1) {
+                  sectionSelected = mList[index].section;
+                } else {
+                  subjectSelected = mList[index].subject;
+                }
+                Navigator.pop(context);
+              });
+            },
+            child: Builder(builder: (context) {
+              return type == 0
+                  ? ListButton(0, mIconData, mList[index].classes, context)
+                  : type == 1
+                      ? ListButton(0, mIconData, mList[index].section, context)
+                      : ListButton(0, mIconData, mList[index].subject, context);
+            }),
+          ));
+        },
+      ),
+    );
+  }
+
   _imgFromCamera() async {
     File image = await ImagePicker.pickImage(
         source: ImageSource.camera, imageQuality: 50);
@@ -96,50 +235,71 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
 
   Widget _Button(
       int type, IconData my_icon, String str_title, BuildContext _context) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.only(left: 2, right: 2),
-        child: Material(
-          shadowColor: Colors.blueAccent,
-          elevation: 10,
-          borderRadius: borderRadius,
-          child: Container(
-            height: 50.0,
-            decoration: BoxDecoration(
-              borderRadius: borderRadius,
-            ),
-            child: Row(
-              children: <Widget>[
-                LayoutBuilder(builder: (context, constraints) {
-                  print(constraints);
-                  return Container(
-                    height: constraints.maxHeight,
-                    width: constraints.maxHeight,
-                    decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: borderRadius,
-                    ),
-                    child: Icon(
-                      my_icon,
-                      color: Colors.white,
-                    ),
-                  );
-                }),
-                Expanded(
-                  child: Text(
-                    str_title,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
+    return Container(
+      margin: EdgeInsets.only(left: 2, right: 2),
+      child: Material(
+        shadowColor: Colors.blueAccent,
+        elevation: 10,
+        borderRadius: borderRadius,
+        child: Container(
+          height: 50.0,
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+          ),
+          child: Row(
+            children: <Widget>[
+              LayoutBuilder(builder: (context, constraints) {
+                print(constraints);
+                return Container(
+                  height: constraints.maxHeight,
+                  width: constraints.maxHeight,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: borderRadius,
+                  ),
+                  child: Icon(
+                    my_icon,
+                    color: Colors.white,
+                  ),
+                );
+              }),
+              Expanded(
+                child: Text(
+                  str_title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  void _showDatePicker(ctx) {
+    showCupertinoModalPopup(
+        context: ctx,
+        builder: (_) => Container(
+              height: 190,
+              color: Color.fromARGB(255, 255, 255, 255),
+              child: Column(
+                children: [
+                  Container(
+                    height: 180,
+                    child: CupertinoDatePicker(
+                        initialDateTime: DateTime.now(),
+                        onDateTimeChanged: (val) {
+                          setState(() {
+                            dateSelected = val.toString();
+                          });
+                        }),
+                  ),
+                ],
+              ),
+            ));
   }
 
   @override
@@ -157,6 +317,7 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
           child: ListView(
             children: [
               Container(
+                  height: 52,
                   margin: EdgeInsets.only(top: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -165,29 +326,43 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
                       Expanded(
                           child: InkWell(
                         onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("Classes"),
-                                  content: setupAlertDialoadContainer(),
-                                );
-                              });
+                          getClassList(context);
                         },
-                        child: _Button(0, Icons.class_, "Class", context),
+                        child: _Button(0, Icons.class_, classSelected, context),
                       )),
-                      _Button(
-                          1, Icons.people_outline_outlined, "Section", context),
+                      Expanded(
+                          child: InkWell(
+                        onTap: () {
+                          getSectionList(context);
+                        },
+                        child: _Button(1, Icons.people_outline_outlined,
+                            sectionSelected, context),
+                      )),
                     ],
                   )),
               Container(
+                height: 52,
                 margin: EdgeInsets.only(top: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _Button(2, Icons.subject, "Subject", context),
-                    _Button(3, Icons.date_range, "Submission Date", context),
+                    Expanded(
+                        child: InkWell(
+                      onTap: () {
+                        getSubjectList(context);
+                      },
+                      child:
+                          _Button(2, Icons.subject, subjectSelected, context),
+                    )),
+                    Expanded(
+                        child: InkWell(
+                      onTap: () {
+                        _showDatePicker(context);
+                      },
+                      child:
+                          _Button(3, Icons.date_range, dateSelected, context),
+                    )),
                   ],
                 ),
               ),
@@ -243,13 +418,13 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
                 ),
               ),
               Container(
+                height: 200,
                 child: Stack(
                   children: <Widget>[
                     Center(
                       child: Container(
                         padding: EdgeInsets.all(16),
                         margin: EdgeInsets.only(top: 16, right: 12, left: 12),
-                        height: 200,
                         alignment: Alignment.center,
                         child: _image == null
                             ? Text(
@@ -299,50 +474,5 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
         ),
       );
     });
-  }
-
-  Widget setupAlertDialoadContainer() {
-    return Container(
-      height: 300.0, // Change as per your requirement
-      width: 300.0, // Change as per your requirement
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: 5,
-        itemBuilder: (BuildContext context, int index) {
-          return Expanded(
-              child: InkWell(
-            onTap: () {
-              getClassList();
-              print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@1");
-            },
-            child: ListButton(0, Icons.class_, "Class", context),
-          ));
-        },
-      ),
-    );
-  }
-}
-
-class Post {
-  final String temperature, rain, humidity, sunrise, sunset, updateDate;
-
-  Post({
-    this.temperature,
-    this.rain,
-    this.humidity,
-    this.sunrise,
-    this.sunset,
-    this.updateDate,
-  });
-
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return new Post(
-      temperature: json['temperature'].toString(),
-      rain: json['rain'].toString(),
-      humidity: json['humidity'].toString(),
-      sunrise: json['sunrise'].toString(),
-      sunset: json['sunset'].toString(),
-      updateDate: json['utcTime'].toString(),
-    );
   }
 }
