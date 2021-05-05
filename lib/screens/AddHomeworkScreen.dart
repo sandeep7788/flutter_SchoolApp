@@ -12,7 +12,6 @@ import 'package:flutter_applicationdemo08/models/SectionModel.dart';
 import 'package:flutter_applicationdemo08/models/SubjectModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-// import 'package:givegratis/SharedPreference/Dialogs.dart';
 
 var url = "https://miro.medium.com/max/2160/1*9JzKFil-Xsip742fdxDqZw.jpeg";
 
@@ -35,6 +34,7 @@ class AddHomeworkScreen extends StatefulWidget {
 }
 
 class _AddHomeworkScreen extends State<AddHomeworkScreen> {
+
   Future getClassList(BuildContext context) async {
     ProcessDialog().showProgressDialog(context, "Please wait ...");
 

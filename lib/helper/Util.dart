@@ -87,8 +87,9 @@ class Util {
         });
   }
 
-
-
+  navigateToNextScreen(BuildContext context, StatefulWidget homeworkListScreeen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => homeworkListScreeen));
+  }
   /// converter (to/from String)
   static String dateTimeToString(DateTime t) => t.toUtc().toIso8601String();
   static DateTime stringToDateTime(String s) => DateTime.parse(s).toUtc();

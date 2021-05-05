@@ -5,6 +5,8 @@ import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
 import 'package:flutter_applicationdemo08/screens/SignUp.dart';
 
+import 'Affiche_grille.dart';
+
 class Splash extends StatefulWidget {
   _Splash createState() => _Splash();
 }
@@ -51,7 +53,7 @@ class _Splash extends State<Splash> {
 }
 
 asyncMethod(BuildContext context) async {
-  if (await SharedPreferencesClass.isLogin()) {
+  if (await SharedPreferencesClass.isLogin() != null) {
     await dashboardScreen(context);
   } else {
     await signUpScreen(context);
@@ -62,7 +64,7 @@ void dashboardScreen(BuildContext context) {
   Timer(
       Duration(seconds: 2),
       () => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Dashboard())));
+          context, MaterialPageRoute(builder: (context) => Affiche_grille())));
 }
 
 void signUpScreen(BuildContext context) {

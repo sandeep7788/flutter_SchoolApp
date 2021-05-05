@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/common_widget/ProcessDialog.dart';
+import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
 import 'package:flutter_applicationdemo08/helper/Toast.dart';
 import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/models/HolidayListModel.dart';
@@ -29,7 +30,8 @@ class _ScreenCalendarState extends State<HolidayScreem> {
 
     ProcessDialog().showProgressDialog(context, "Please wait ...");
 
-    final body = {ApiContent.PREF_KEY_school_id: "28"};
+    final body = {ApiContent.PREF_KEY_school_id: (await SharedPreferencesClass.get(ApiContent.PREF_school_id)).toString()};
+
     final headers = {HttpHeaders.contentTypeHeader: 'application/json'};
     var uri = Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_HOLIDAY_LIST, body);
 

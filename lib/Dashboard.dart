@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
 import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/list_item_widget/MainMenuCard.dart';
+import 'package:flutter_applicationdemo08/screens/AttandenceScreen.dart';
+import 'package:flutter_applicationdemo08/screens/HolidayScreen.dart';
+import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'APIContent.dart';
 import 'model/Choice.dart';
@@ -106,6 +109,8 @@ class _Dashboard extends State<Dashboard> {
   Future<void> initState() {
     super.initState();
     setDetails();
+
+
   }
   Widget sliverGridWidget(BuildContext context){
     return StaggeredGridView.countBuilder(
@@ -123,8 +128,16 @@ class _Dashboard extends State<Dashboard> {
           ),
           shadowColor: Colors.blueAccent,
           color: Colors.white70,
-          child: Container(
-              color: Colors.white,
+          child: GestureDetector(
+              onTap: () => {
+                if(index==0) {
+                 Util().navigateToNextScreen(context,HomeworkListScreeen())
+                }else if(index==1){
+                  Util().navigateToNextScreen(context,HolidayScreem())
+                }else if(index==2) {
+                   Util().navigateToNextScreen(context,AttandenceScreen())
+                }
+              },
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,6 +170,10 @@ class _Dashboard extends State<Dashboard> {
       mainAxisSpacing: 1.0,
       crossAxisSpacing:1.0,
     );
+  }
+
+  navigateToNextScreen(BuildContext context, StatefulWidget homeworkListScreeen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => homeworkListScreeen));
   }
 }
 
