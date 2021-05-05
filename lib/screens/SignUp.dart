@@ -7,7 +7,7 @@ import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/common_widget/ProcessDialog.dart';
 import 'package:flutter_applicationdemo08/common_widget/RaisedGradientButton.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
-import 'package:flutter_applicationdemo08/helper/Toast.dart';
+import 'package:flutter_applicationdemo08/helper/CustomToast.dart';
 import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/models/SignUppModel.dart';
 import 'package:http/http.dart' as http;
@@ -57,7 +57,7 @@ Future<SignUppModel> doSignUp(
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
 
     } else {
-      Toast.show(ApiContent.something_wrong, context);
+      CustomToast.show(ApiContent.something_wrong, context);
       Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later);
     }
   } else {

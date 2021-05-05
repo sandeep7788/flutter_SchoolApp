@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class Toast {
+class CustomToast {
   static void show(String msg, BuildContext context) {
     Color textColor = Colors.white;
     Color backgroundColor = Colors.blueAccent;
     dismiss();
-    Toast._createView(msg, context, backgroundColor, textColor);
+    CustomToast._createView(msg, context, backgroundColor, textColor);
   }
 
   static OverlayEntry _overlayEntry;
@@ -90,7 +90,7 @@ class _ToastWidgetState extends State<_ToastAnimatedWidget>
   Widget build(BuildContext context) {
     Timer(
         Duration(seconds: 2),
-            () => Toast.dismiss() );
+            () => CustomToast.dismiss() );
 
     return Positioned(
         bottom: 50,

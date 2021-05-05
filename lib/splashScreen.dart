@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
+import 'package:flutter_applicationdemo08/screens/AttandenceScreen.dart';
 import 'package:flutter_applicationdemo08/screens/SignUp.dart';
 
 import 'Affiche_grille.dart';
@@ -64,7 +65,7 @@ void dashboardScreen(BuildContext context) {
   Timer(
       Duration(seconds: 2),
       () => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Affiche_grille())));
+          context, MaterialPageRoute(builder: (context) => AttandenceScreen())));
 }
 
 void signUpScreen(BuildContext context) {

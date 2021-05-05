@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
 import 'package:flutter_applicationdemo08/common_widget/ListItemWidgets.dart';
 import 'package:flutter_applicationdemo08/common_widget/ProcessDialog.dart';
+import 'package:flutter_applicationdemo08/helper/CustomToast.dart';
+import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
+import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/models/ClassModel.dart';
 import 'package:flutter_applicationdemo08/models/SectionModel.dart';
 import 'package:flutter_applicationdemo08/models/StudentAttandanceModel.dart';
@@ -20,22 +23,21 @@ List<ClassModel> listClasses = List();
 List<StudentAttandanceModel> listAttandance = List();
 List<SectionModel> listSection = List();
 
-List<YourObject> radioButtonId = new List();
+List<int> groupValue = [];
+List<List<int>> value = [];
+var class_id = "";
+var section_id = "";
 
 class AttandenceScreen extends StatefulWidget {
   _AddHomeworkScreen createState() => _AddHomeworkScreen();
 }
 
 class _AddHomeworkScreen extends State<AttandenceScreen> {
-  int _selectedItem = 0;
-
-
-
-
   Future getClassList(BuildContext context) async {
     ProcessDialog().showProgressDialog(context, "Please wait ...");
 
-    var uri = Uri.parse(ApiContent.PREF_GET_CLASSES);
+    var uri = Uri.parse(ApiContent.PREF_GET_CLASSES +
+        await SharedPreferencesClass.get(ApiContent.PREF_school_id));
     var response = await http.get(
       uri,
       headers: <String, String>{
@@ -45,6 +47,7 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
     if (response.statusCode == 200 && response.body.length > 0) {
       List<dynamic> list = json.decode(response.body);
 
+      listClasses.clear();
       for (var i = 0; i < list.length; i++) {
         ClassModel fact = ClassModel.fromJson(list[i]);
         listClasses.add(fact);
@@ -73,27 +76,55 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
   Future getstudents(BuildContext context) async {
     ProcessDialog().showProgressDialog(context, "Please wait ...");
 
-    var uri = Uri.parse(ApiContent.PREF_GET_STUDENT);
-    var response = await http.get(
-      uri,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-    );
-    if (response.statusCode == 200 && response.body.length > 0) {
-      List<dynamic> list = json.decode(response.body);
+    try {
+      var uri = Uri.parse(ApiContent.PREF_GET_STUDENT +
+          "school_id=" +
+          await SharedPreferencesClass.get(ApiContent.PREF_school_id) +
+          "&class_id=" +
+          class_id.toString() +
+          "&section_id=" +
+          section_id.toString() +
+          "&school_session=" +
+          "2020-2021");
 
-      for (var i = 0; i < list.length; i++) {
-        StudentAttandanceModel fact = StudentAttandanceModel.fromJson(list[i]);
-        listAttandance.add(fact);
+      log.fine(ApiContent.PREF_GET_STUDENT +
+          "school_id=" +
+          await SharedPreferencesClass.get(ApiContent.PREF_school_id) +
+          "&class_id=" +
+          class_id.toString() +
+          "&section_id=" +
+          section_id.toString() +
+          "&school_session=" +
+          "2020-2021");
+      var response = await http.get(
+        uri,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+      );
+      log.fine(response.body.toString());
 
-        for (var j = 0; j < 4; j++)
-        radioButtonId.add(YourObject(index0: i,index1: j));
+      if (response.statusCode == 200 && response.body.length > 0) {
+        List<dynamic> list = json.decode(response.body);
 
+        value.clear();
+        listAttandance.clear();
+        groupValue.clear();
+
+        for (var i = 0; i < list.length; i++) {
+          StudentAttandanceModel fact =
+              StudentAttandanceModel.fromJson(list[i]);
+          listAttandance.add(fact);
+          value.add([i, int.parse("9999999$i"), int.parse("99999999$i")]);
+          groupValue.add(int.parse("99999999$i"));
+        }
+        setState(() {});
+        Navigator.pop(context);
+      } else {
+        Navigator.pop(context);
       }
-      setState(() {});
-    } else {
-      Navigator.pop(context);
+    } catch (e) {
+      log.error(e);
     }
   }
 
@@ -107,6 +138,7 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
     );
     print("@@@@" + response.body);
 
+    listSection.clear();
     if (response.statusCode == 200 && response.body.length > 0) {
       List<dynamic> list = json.decode(response.body);
 
@@ -137,7 +169,7 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
       BuildContext context, List<dynamic> mList, IconData mIconData, int type) {
     return Container(
       height: 500.0, // Change as per your requirement
-      width: 300.0, // Change as per your requirement
+      width: 300.0,
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: mList.length,
@@ -145,15 +177,19 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
           return Expanded(
               child: InkWell(
             onTap: () {
-              setState(() {
+              setState(() async {
                 if (type == 0) {
                   classSelected = mList[index].classes;
+                  class_id = mList[index].id;
+                  await getstudents(context);
                 } else if (type == 1) {
                   sectionSelected = mList[index].section;
+                  section_id = mList[index].id;
+                  getstudents(context);
                 } else {
                   subjectSelected = mList[index].subject;
                 }
-                Navigator.pop(context);
+                Navigator.of(context, rootNavigator: true).pop();
               });
             },
             child: Builder(builder: (context) {
@@ -169,14 +205,9 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
     );
   }
 
-
-
-  String radioButtonItem = 'ONE';
-
   @override
   void initState() {
     super.initState();
-    getstudents(context);
   }
 
   @override
@@ -191,7 +222,7 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
           centerTitle: true,
         ),
         body: Container(
-          margin: EdgeInsets.only(left: 8, right: 8),
+          margin: EdgeInsets.only(left: 8, right: 8, top: 8),
           child: ListView(
             children: [
               Container(
@@ -212,81 +243,202 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
                       Expanded(
                           child: InkWell(
                         onTap: () {
-                          getSectionList(context);
+                          if (listClasses.length > 0) {
+                            getSectionList(context);
+                          } else {
+                            CustomToast.show(
+                                "Please first select Class", context);
+                          }
                         },
                         child: customButton(1, Icons.people_outline_outlined,
                             sectionSelected, context),
                       )),
                     ],
                   )),
-/*
+              listAttandance.isNotEmpty ? headLineContainer() : msgNothinToShow(),
               Container(
                 child: Expanded(
+                    flex: 1,
                     child: Container(
-                  height: 350.0,
-                  child: ListView.builder(
-                    itemCount: listAttandance.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return  new Container(
-                        margin: new EdgeInsets.all(15.0),
-                        child: new Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Radio(
-                              value: radioButtonId[index].index1,
-                              groupValue: index,
-                              onChanged: (val) {
-                                setState(() {
-                                  radioButtonItem = 'TWO';
-                                  radioButtonId[index].index1 = index;
-                                });
-                              },
-                            ),
-                            Text(
-                              'TWO',
-                              style: new TextStyle(
-                                fontSize: 12.0,
+                      margin: EdgeInsets.only(top: 8),
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView.builder(
+                        itemCount: listAttandance.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return new Container(
+                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 8.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black87,
                               ),
+                              borderRadius: BorderRadius.circular(4),
                             ),
-
-                            Radio(
-                              value: id,
-                              groupValue: index,
-                              onChanged: (val) {
-                                setState(() {
-                                  radioButtonItem = 'THREE';
-                                  id = index;
-                                });
-                              },
+                            margin: new EdgeInsets.all(4.0),
+                            child: new Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  width: 120,
+                                  child: Text(
+                                    listAttandance[index].student,
+                                    style: new TextStyle(
+                                        color: Colors.blueAccent,
+                                        fontSize: 16,
+                                        fontFamily: "intel",
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                                Card(
+                                  elevation: 4,
+                                  margin:
+                                      EdgeInsets.fromLTRB(16.0, 4.0, 4.0, 8.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  shadowColor: Colors.blueAccent,
+                                  color: Colors.white,
+                                  child: Radio(
+                                    activeColor: Colors.red,
+                                    value: value[index][0],
+                                    groupValue: groupValue[index],
+                                    onChanged: (val) {
+                                      setState(() {
+                                        setState(() => groupValue[index] = val);
+                                        log.fine(groupValue.toString());
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Card(
+                                  elevation: 4,
+                                  margin:
+                                      EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 8.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  shadowColor: Colors.blueAccent,
+                                  color: Colors.white,
+                                  child: Radio(
+                                    activeColor: Colors.red,
+                                    value: value[index][1],
+                                    groupValue: groupValue[index],
+                                    onChanged: (val) {
+                                      setState(() {
+                                        setState(() => groupValue[index] = val);
+                                        log.fine(groupValue.toString());
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Card(
+                                  elevation: 4,
+                                  margin:
+                                      EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 8.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  shadowColor: Colors.blueAccent,
+                                  color: Colors.white,
+                                  child: Radio(
+                                    activeColor: Colors.black12,
+                                    value: value[index][2],
+                                    groupValue: groupValue[index],
+                                    onChanged: (val) {
+                                      setState(() {
+                                        setState(() => groupValue[index] = val);
+                                        log.fine(groupValue.toString());
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'THREE',
-                              style: new TextStyle(fontSize: 12.0),
-                            ),
-                            new Container(
-                              margin: new EdgeInsets.only(left: 10.0),
-                              child: new Text(listAttandance[index].student),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                )),
+                          );
+                        },
+                      ),
+                    )),
               )
-*/
             ],
           ),
         ),
       );
     });
   }
-}
 
+  headLineContainer() {
+    return Container(
+      child: Expanded(
+        child: Card(
+          margin: EdgeInsets.only(top: 16),
+          elevation: 4,
+          shadowColor: Colors.blueAccent,
+          child: Container(
+            margin: EdgeInsets.only(top: 4, bottom: 4),
+            padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+            color: Colors.blueAccent,
+            height: 50,
+            child: new Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    width: 120,
+                    child: Text(
+                      "St name",
+                      style: new TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontFamily: "intel",
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  Text(
+                    "Absent",
+                    style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: "intel",
+                        fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    "Leave",
+                    style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: "intel",
+                        fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    "Clear",
+                    style: new TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: "intel",
+                        fontWeight: FontWeight.w700),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
 
-class YourObject {
-  final int index0;
-  final int index1;
+  msgNothinToShow() {
+    return Container(
+      margin: EdgeInsets.only(top: 41),
+      height: MediaQuery.of(context).size.height,
+    child:
+         Text(
+          "Nothing to Show \n from this class or section",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Colors.blueAccent,
+              fontSize: 16,
+              fontFamily: "intel",
+              fontWeight: FontWeight.w100),
 
-  YourObject({this.index0, this.index1});
+      ),
+    );
+  }
 }
