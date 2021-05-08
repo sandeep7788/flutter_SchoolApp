@@ -8,6 +8,7 @@ import 'package:flutter_applicationdemo08/list_item_widget/MainMenuCard.dart';
 import 'package:flutter_applicationdemo08/screens/AttandenceScreen.dart';
 import 'package:flutter_applicationdemo08/screens/HolidayScreen.dart';
 import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
+import 'package:flutter_applicationdemo08/screens/MomentsLIstScreen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'APIContent.dart';
 import 'model/Choice.dart';
@@ -134,7 +135,9 @@ class _Dashboard extends State<Dashboard> {
                  Util().navigateToNextScreen(context,HomeworkListScreeen())
                 }else if(index==1){
                   Util().navigateToNextScreen(context,HolidayScreem())
-                }else if(index==2) {
+                }else if(index==2){
+                  Util().navigateToNextScreen(context,MomentsListScreen())
+                }else if(index==6) {
                    Util().navigateToNextScreen(context,AttandenceScreen())
                 }
               },

@@ -18,9 +18,9 @@ var url = "https://miro.medium.com/max/2160/1*9JzKFil-Xsip742fdxDqZw.jpeg";
 get borderRadius => BorderRadius.circular(8.0);
 TextEditingController str_homework_title = TextEditingController();
 TextEditingController str_homework_description = TextEditingController();
-var classSelected = "Classes";
-var sectionSelected = "Section";
-var subjectSelected = "Subject";
+var _classSelected = "Classes";
+var _sectionSelected = "Section";
+var _subjectSelected = "Subject";
 var dateSelected = "Submission Date";
 File _image;
 List<ClassModel> listClasses = List();
@@ -159,11 +159,11 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
             onTap: () {
               setState(() {
                 if (type == 0) {
-                  classSelected = mList[index].classes;
+                  _classSelected = mList[index].classes;
                 } else if (type == 1) {
-                  sectionSelected = mList[index].section;
+                  _sectionSelected = mList[index].section;
                 } else {
-                  subjectSelected = mList[index].subject;
+                  _subjectSelected = mList[index].subject;
                 }
                 Navigator.pop(context);
               });
@@ -328,7 +328,7 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
                         onTap: () {
                           getClassList(context);
                         },
-                        child: _Button(0, Icons.class_, classSelected, context),
+                        child: _Button(0, Icons.class_, _classSelected, context),
                       )),
                       Expanded(
                           child: InkWell(
@@ -336,7 +336,7 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
                           getSectionList(context);
                         },
                         child: _Button(1, Icons.people_outline_outlined,
-                            sectionSelected, context),
+                            _sectionSelected, context),
                       )),
                     ],
                   )),
@@ -353,7 +353,7 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
                         getSubjectList(context);
                       },
                       child:
-                          _Button(2, Icons.subject, subjectSelected, context),
+                          _Button(2, Icons.subject, _subjectSelected, context),
                     )),
                     Expanded(
                         child: InkWell(

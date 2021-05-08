@@ -36,7 +36,7 @@ class _ScreenCalendarState extends State<HolidayScreem> {
     var uri = Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_HOLIDAY_LIST, body);
 
     var response = await http.post(uri, headers: headers);
-
+    log.fine(response.body);
     // Navigator.pop(context);
 
     if (response.statusCode == 200) {

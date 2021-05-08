@@ -65,7 +65,7 @@ void dashboardScreen(BuildContext context) {
   Timer(
       Duration(seconds: 2),
       () => Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => AttandenceScreen())));
+          context, MaterialPageRoute(builder: (context) => Dashboard())));
 }
 
 void signUpScreen(BuildContext context) {
