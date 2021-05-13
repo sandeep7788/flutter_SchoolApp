@@ -5,13 +5,29 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
+import 'package:flutter_applicationdemo08/common_widget/CustomButton.dart';
 import 'package:flutter_applicationdemo08/common_widget/ListItemWidgets.dart';
 import 'package:flutter_applicationdemo08/common_widget/ProcessDialog.dart';
+import 'package:flutter_applicationdemo08/helper/CustomToast.dart';
+import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/models/ClassModel.dart';
 import 'package:flutter_applicationdemo08/models/SectionModel.dart';
 import 'package:flutter_applicationdemo08/models/SubjectModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
+import '../Dashboard.dart';
 
 var url = "https://miro.medium.com/max/2160/1*9JzKFil-Xsip742fdxDqZw.jpeg";
 
@@ -34,6 +50,56 @@ class AddHomeworkScreen extends StatefulWidget {
 }
 
 class _AddHomeworkScreen extends State<AddHomeworkScreen> {
+
+  Upload(File imageFile) async {
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+
+    var uri = Uri.parse(ApiContent.PREF_POST_INSERT_HOMEWORK);
+
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(imageFile.path));
+
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+  }
+
+  Future insertHomeWork(
+      BuildContext context, String number, String password) async {
+    ProcessDialog().showProgressDialog(context, "Please wait ...");
+
+    final body = {
+      ApiContent.PREF_NUMBER: number.trim(),
+      ApiContent.PREF_PASS: password.trimRight(),
+      ApiContent.PREF_REMEMBER_TOKEN: " ",
+    };
+    final headers = {HttpHeaders.contentTypeHeader: 'application/json'};
+    var uri = Uri.https(
+        ApiContent.PREF_BASE_URL, ApiContent.PREF_POST_INSERT_HOMEWORK, body);
+
+    var response = await http.post(uri, headers: headers);
+    Navigator.pop(context);
+    if (response.statusCode == 200) {
+      List<dynamic> list = json.decode(response.body);
+
+      if (list.length > 0) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Dashboard()));
+      } else {
+        CustomToast.show(ApiContent.something_wrong, context);
+        Util().showMessageDialog(
+            context, ApiContent.something_wrong, ApiContent.try_later,true);
+      }
+    } else {
+      Util().showMessageDialog(
+          context, ApiContent.something_wrong, ApiContent.try_later,false);
+    }
+  }
 
   Future getClassList(BuildContext context) async {
     ProcessDialog().showProgressDialog(context, "Please wait ...");
@@ -74,6 +140,7 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
   }
 
   Future getSectionList(BuildContext context) async {
+
     var uri = Uri.parse(ApiContent.PREF_GET_SECTION);
     var response = await http.get(
       uri,
@@ -233,51 +300,6 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
         });
   }
 
-  Widget _Button(
-      int type, IconData my_icon, String str_title, BuildContext _context) {
-    return Container(
-      margin: EdgeInsets.only(left: 2, right: 2),
-      child: Material(
-        shadowColor: Colors.blueAccent,
-        elevation: 10,
-        borderRadius: borderRadius,
-        child: Container(
-          height: 50.0,
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-          ),
-          child: Row(
-            children: <Widget>[
-              LayoutBuilder(builder: (context, constraints) {
-                print(constraints);
-                return Container(
-                  height: constraints.maxHeight,
-                  width: constraints.maxHeight,
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    borderRadius: borderRadius,
-                  ),
-                  child: Icon(
-                    my_icon,
-                    color: Colors.white,
-                  ),
-                );
-              }),
-              Expanded(
-                child: Text(
-                  str_title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   void _showDatePicker(ctx) {
     showCupertinoModalPopup(
@@ -313,166 +335,170 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
           ),
           centerTitle: true,
         ),
-        body: Container(
-          child: ListView(
-            children: [
-              Container(
-                  height: 52,
-                  margin: EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          child: InkWell(
+        body: _AddHomeworkUi(context),
+      );
+    });
+  }
+  Widget _AddHomeworkUi(BuildContext context) {
+    return Container(
+      child: ListView(
+        children: [
+          Container(
+              height: 52,
+              margin: EdgeInsets.only(top: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      child: InkWell(
                         onTap: () {
                           getClassList(context);
                         },
-                        child: _Button(0, Icons.class_, _classSelected, context),
+                        child:
+                        CustomButton(0, Icons.class_, _classSelected, context),
                       )),
-                      Expanded(
-                          child: InkWell(
+                  Expanded(
+                      child: InkWell(
                         onTap: () {
                           getSectionList(context);
                         },
-                        child: _Button(1, Icons.people_outline_outlined,
+                        child: CustomButton(1, Icons.people_outline_outlined,
                             _sectionSelected, context),
                       )),
-                    ],
-                  )),
-              Container(
-                height: 52,
-                margin: EdgeInsets.only(top: 8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        child: InkWell(
+                ],
+              )),
+          Container(
+            height: 52,
+            margin: EdgeInsets.only(top: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                    child: InkWell(
                       onTap: () {
                         getSubjectList(context);
                       },
                       child:
-                          _Button(2, Icons.subject, _subjectSelected, context),
+                      CustomButton(2, Icons.subject, _subjectSelected, context),
                     )),
-                    Expanded(
-                        child: InkWell(
+                Expanded(
+                    child: InkWell(
                       onTap: () {
                         _showDatePicker(context);
                       },
                       child:
-                          _Button(3, Icons.date_range, dateSelected, context),
+                      CustomButton(3, Icons.date_range, dateSelected, context),
                     )),
-                  ],
-                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 12, right: 12, top: 24),
+            child: new Theme(
+              data: new ThemeData(
+                primaryColor: Colors.blue,
+                primaryColorDark: Colors.blueAccent,
               ),
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12, top: 24),
-                child: new Theme(
-                  data: new ThemeData(
-                    primaryColor: Colors.blue,
-                    primaryColorDark: Colors.blueAccent,
-                  ),
-                  child: new TextField(
-                    decoration: new InputDecoration(
-                        border: new OutlineInputBorder(
-                            borderSide: new BorderSide(color: Colors.teal)),
-                        hintText: 'HomeWork Title',
-                        helperText: 'please enter min 10 characters',
-                        labelText: 'Title',
-                        prefixIcon: const Icon(
-                          Icons.work,
-                          color: Colors.blueAccent,
-                        ),
-                        prefixText: ' ',
-                        suffixText: 'Eng',
-                        suffixStyle: const TextStyle(color: Colors.black87)),
-                  ),
-                ),
+              child: new TextField(
+                decoration: new InputDecoration(
+                    border: new OutlineInputBorder(
+                        borderSide: new BorderSide(color: Colors.teal)),
+                    hintText: 'HomeWork Title',
+                    helperText: 'please enter min 10 characters',
+                    labelText: 'Title',
+                    prefixIcon: const Icon(
+                      Icons.work,
+                      color: Colors.blueAccent,
+                    ),
+                    prefixText: ' ',
+                    suffixText: 'Eng',
+                    suffixStyle: const TextStyle(color: Colors.black87)),
               ),
-              Container(
-                margin: EdgeInsets.only(left: 12, right: 12, top: 8),
-                child: new Theme(
-                  data: new ThemeData(
-                    primaryColor: Colors.blue,
-                    primaryColorDark: Colors.blueAccent,
-                  ),
-                  child: new TextField(
-                    minLines: 2,
-                    maxLines: 5,
-                    keyboardType: TextInputType.multiline,
-                    decoration: new InputDecoration(
-                        border: new OutlineInputBorder(
-                            borderSide: new BorderSide(color: Colors.teal)),
-                        hintText: 'HomeWork Description',
-                        helperText: 'please enter min 25 characters',
-                        labelText: 'Description',
-                        prefixIcon: const Icon(
-                          Icons.description,
-                          color: Colors.blueAccent,
-                        ),
-                        prefixText: ' ',
-                        suffixText: 'Des',
-                        suffixStyle: const TextStyle(color: Colors.black87)),
-                  ),
-                ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 12, right: 12, top: 8),
+            child: new Theme(
+              data: new ThemeData(
+                primaryColor: Colors.blue,
+                primaryColorDark: Colors.blueAccent,
               ),
-              Container(
-                height: 200,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Container(
-                        padding: EdgeInsets.all(16),
-                        margin: EdgeInsets.only(top: 16, right: 12, left: 12),
-                        alignment: Alignment.center,
-                        child: _image == null
-                            ? Text(
-                                'No image selected.',
-                                style: TextStyle(fontSize: 16),
-                              )
-                            : Image.file(
-                                _image,
-                                fit: BoxFit.fill,
-                              ),
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              new BorderRadius.all(new Radius.circular(8)),
-                          border: _image == null
-                              ? new Border.all(
-                                  color: Colors.grey,
-                                  width: 2.0,
-                                )
-                              : new Border.all(
-                                  color: Colors.blueAccent,
-                                  width: 2.0,
-                                ),
-                        ),
+              child: new TextField(
+                minLines: 2,
+                maxLines: 5,
+                keyboardType: TextInputType.multiline,
+                decoration: new InputDecoration(
+                    border: new OutlineInputBorder(
+                        borderSide: new BorderSide(color: Colors.teal)),
+                    hintText: 'HomeWork Description',
+                    helperText: 'please enter min 25 characters',
+                    labelText: 'Description',
+                    prefixIcon: const Icon(
+                      Icons.description,
+                      color: Colors.blueAccent,
+                    ),
+                    prefixText: ' ',
+                    suffixText: 'Des',
+                    suffixStyle: const TextStyle(color: Colors.black87)),
+              ),
+            ),
+          ),
+          Container(
+            height: 200,
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    margin: EdgeInsets.only(top: 16, right: 12, left: 12),
+                    alignment: Alignment.center,
+                    child: _image == null
+                        ? Text(
+                      'No image selected.',
+                      style: TextStyle(fontSize: 16),
+                    )
+                        : Image.file(
+                      _image,
+                      fit: BoxFit.fill,
+                    ),
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                      new BorderRadius.all(new Radius.circular(8)),
+                      border: _image == null
+                          ? new Border.all(
+                        color: Colors.grey,
+                        width: 2.0,
+                      )
+                          : new Border.all(
+                        color: Colors.blueAccent,
+                        width: 2.0,
                       ),
                     ),
-                    Positioned(
-                        bottom: 15,
-                        right: 24,
-                        //give the values according to your requirement
-                        child: GestureDetector(
-                          onTap: () {
-                            _showPicker(context);
-                          },
-                          child: Container(
-                              child: Icon(
+                  ),
+                ),
+                Positioned(
+                    bottom: 15,
+                    right: 24,
+                    //give the values according to your requirement
+                    child: GestureDetector(
+                      onTap: () {
+                        _showPicker(context);
+                      },
+                      child: Container(
+                          child: Icon(
                             Icons.add_photo_alternate_outlined,
                             color: Colors.blueAccent,
                             size: 60,
                           )),
-                        )),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      );
-    });
+                    )),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

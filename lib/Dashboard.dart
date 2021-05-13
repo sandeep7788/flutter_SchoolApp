@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
 import 'package:flutter_applicationdemo08/helper/Util.dart';
 import 'package:flutter_applicationdemo08/list_item_widget/MainMenuCard.dart';
+import 'package:flutter_applicationdemo08/screens/AccountSetting.dart';
 import 'package:flutter_applicationdemo08/screens/AttandenceScreen.dart';
 import 'package:flutter_applicationdemo08/screens/HolidayScreen.dart';
 import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
+import 'package:flutter_applicationdemo08/screens/LeaveRequest.dart';
 import 'package:flutter_applicationdemo08/screens/MomentsLIstScreen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'APIContent.dart';
@@ -23,10 +25,10 @@ class Dashboard extends StatefulWidget {
 
 Widget _mainAppBar(BuildContext context, String str_teachername) {
   return Container(
-    height: 250.0,
+    height: 180.0,
     color: Colors.blue,
     child: Container(
-      margin: EdgeInsets.only(left: 25),
+      margin: EdgeInsets.only(left: 25, bottom: 16),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -42,45 +44,46 @@ Widget _mainAppBar(BuildContext context, String str_teachername) {
             ),
             Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(left: 8,right: 8),
+                    margin: EdgeInsets.only(left: 8, right: 8),
                     child: Center(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Text(
-                        str_teachername,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 21,
-                            color: Colors.white70,
-                            fontFamily: 'intel',
-                            decoration: TextDecoration.none),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 8,right: 8,top: 4),
-                      child: Text(
-                        str_teacherDes,
-                        maxLines: 2,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white60,
-                            fontFamily: 'intel',
-                            decoration: TextDecoration.none),
-                      ),
-                    ),
-                  ]),
-            )))
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: Text(
+                                str_teachername,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 26,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'intel',
+                                    decoration: TextDecoration.none),
+                              ),
+                            ),
+                            Container(
+                              margin:
+                                  EdgeInsets.only(left: 8, right: 8, top: 4),
+                              child: Text(
+                                str_teacherDes,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'intel',
+                                    decoration: TextDecoration.none),
+                              ),
+                            ),
+                          ]),
+                    )))
           ],
         ),
       ),
     ),
   );
 }
-
-
 
 class _Dashboard extends State<Dashboard> {
   Future<void> setDetails() async {
@@ -93,8 +96,13 @@ class _Dashboard extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(builder: (context, orientation) {
-      return Container(
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.blue,
+      ),
+      body: Container(
         color: Colors.blue,
         child: ListView(
           children: <Widget>[
@@ -102,25 +110,24 @@ class _Dashboard extends State<Dashboard> {
             sliverGridWidget(context)
           ],
         ),
-      );
-    });
+      ),
+    );
   }
 
   @override
   Future<void> initState() {
     super.initState();
     setDetails();
-
-
   }
-  Widget sliverGridWidget(BuildContext context){
+
+  Widget sliverGridWidget(BuildContext context) {
     return StaggeredGridView.countBuilder(
       padding: const EdgeInsets.all(8.0),
       crossAxisCount: 4,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemCount: choices.length,
-      itemBuilder: (context, index){
+      itemBuilder: (context, index) {
         return Card(
           elevation: 4,
           margin: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 8.0),
@@ -131,27 +138,33 @@ class _Dashboard extends State<Dashboard> {
           color: Colors.white70,
           child: GestureDetector(
               onTap: () => {
-                if(index==0) {
-                 Util().navigateToNextScreen(context,HomeworkListScreeen())
-                }else if(index==1){
-                  Util().navigateToNextScreen(context,HolidayScreem())
-                }else if(index==2){
-                  Util().navigateToNextScreen(context,MomentsListScreen())
-                }else if(index==6) {
-                   Util().navigateToNextScreen(context,AttandenceScreen())
-                }
-              },
+                    if (index == 0)
+                      {
+                        Util().navigateToNextScreen(context, HomeworkListScreeen())
+                      }
+                    else if (index == 1)
+                      {Util().navigateToNextScreen(context, HolidayScreem())}
+                    else if (index == 2)
+                      {
+                        Util().navigateToNextScreen(context, MomentsListScreen())
+                      }
+                    else if (index == 6)
+                      {Util().navigateToNextScreen(context, AttandenceScreen())}
+                    else if (index == 3)
+                      {Util().navigateToNextScreen(context, LeaveRequest())}
+                    else if (index == 8)
+                      {Util().navigateToNextScreen(context, AccountSetting())}
+                  },
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     new Expanded(
                       child: new Container(
-
                         child: new Icon(
                           choices[index].icon,
                           color: Colors.blueAccent,
-                          size: 50.0,
+                          size: 80.0,
                         ),
                       ),
                       flex: 2,
@@ -161,22 +174,28 @@ class _Dashboard extends State<Dashboard> {
                           margin: EdgeInsets.only(top: 12),
                           child: new Text(
                             choices[index].title,
-                            style: TextStyle(fontSize: 16, color: Colors.black),
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'intel'),
                           )),
                       flex: 1,
                     ),
-                  ])
-          ),
+                  ])),
         );
       },
-      staggeredTileBuilder: (index) => StaggeredTile.count(2,2.5), //Make size as you want.
+      staggeredTileBuilder: (index) => StaggeredTile.count(2, 2.5),
+      //Make size as you want.
       mainAxisSpacing: 1.0,
-      crossAxisSpacing:1.0,
+      crossAxisSpacing: 1.0,
     );
   }
 
-  navigateToNextScreen(BuildContext context, StatefulWidget homeworkListScreeen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => homeworkListScreeen));
+  navigateToNextScreen(
+      BuildContext context, StatefulWidget homeworkListScreeen) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => homeworkListScreeen));
   }
 }
 
@@ -190,6 +209,5 @@ const List<Choice> choices = const <Choice>[
   const Choice(title: 'Attendances', icon: Icons.people_alt_outlined),
   const Choice(
       title: 'Notification', icon: Icons.notifications_active_outlined),
-  const Choice(title: 'WiFi', icon: Icons.wifi),
+  const Choice(title: 'Profile', icon: Icons.account_circle),
 ];
-

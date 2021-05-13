@@ -16,6 +16,11 @@ class _Splash extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        brightness: Brightness.dark, // this makes status bar text color black
+        backgroundColor: Colors.blueAccent,
+      ),
       backgroundColor: Colors.blueAccent,
       body: Container(
         width: double.infinity,

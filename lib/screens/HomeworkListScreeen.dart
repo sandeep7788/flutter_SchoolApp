@@ -70,7 +70,7 @@ class _AddHomeworkScreen extends State<HomeworkListScreeen> {
       });
     } else {
       Util().showMessageDialog(
-          context, ApiContent.something_wrong, ApiContent.try_later);
+          context, ApiContent.something_wrong, ApiContent.try_later,false);
     }
   }
 

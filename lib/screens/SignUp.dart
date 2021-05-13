@@ -33,8 +33,8 @@ Future<SignUppModel> doSignUp(
   };
   final headers = {HttpHeaders.contentTypeHeader: 'application/json'};
   var uri = Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_LOGIN, body);
-
   var response = await http.post(uri, headers: headers);
+
   Navigator.pop(context);
   if (response.statusCode == 200) {
     List<dynamic> list = json.decode(response.body);
@@ -58,10 +58,10 @@ Future<SignUppModel> doSignUp(
 
     } else {
       CustomToast.show(ApiContent.something_wrong, context);
-      Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later);
+      Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later,false);
     }
   } else {
-    Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later);
+    Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later,false);
   }
 }
 

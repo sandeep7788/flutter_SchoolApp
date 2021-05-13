@@ -5,7 +5,7 @@ Widget widgetCustomButton(String strTitle,
     BuildContext _context) {
   return Container(
     height: 50,
-    margin: EdgeInsets.only(left: 8, right: 8,bottom: 4),
+    margin: EdgeInsets.only(left: 4, right: 4,bottom: 4),
     width: MediaQuery.of(_context).size.width,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.all(
@@ -20,7 +20,7 @@ Widget widgetCustomButton(String strTitle,
             Colors.blue[800],
             Colors.blue[700],
             Colors.blue[600],
-            Colors.blue[500],
+            Colors.blue[600],
             Colors.blue[600],
             Colors.blue[700],
             Colors.blue[800],

@@ -1,6 +1,6 @@
 import 'dart:math' as Math;
 import 'dart:ui';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -48,8 +48,19 @@ bool compareDuration(Duration v1, Duration v2, [int fractionInMilliseconds]) {
 
 class Util {
 
-  showMessageDialog(BuildContext context, String title, String description) {
-    showDialog(
+  getCurrentDate() {
+    return DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+  }
+
+  getFormatedDate(_date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(_date);
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    return outputFormat.format(inputDate);
+  }
+
+  showMessageDialog(BuildContext context, String title, String description,bool goBack) async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -76,7 +87,9 @@ class Util {
                     fontFamily: 'intel'
                   ),
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => {
+                  Navigator.pop(context)
+                },
               ),
             ],
             actionsPadding: EdgeInsets.symmetric(
@@ -85,10 +98,16 @@ class Util {
             ),
           );
         });
+    if(goBack) {
+      Navigator.pop(context);
+    }
   }
 
-  navigateToNextScreen(BuildContext context, StatefulWidget homeworkListScreeen) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => homeworkListScreeen));
+  navigateToNextScreen(BuildContext context, StatefulWidget _StatefulWidget) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => _StatefulWidget));
+  }
+  navigateToBack(BuildContext context) {
+    Navigator.pop(context);
   }
   /// converter (to/from String)
   static String dateTimeToString(DateTime t) => t.toUtc().toIso8601String();

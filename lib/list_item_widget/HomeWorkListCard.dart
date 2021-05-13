@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/models/HomeWorkListModel.dart';
 
+import '../APIContent.dart';
+
 class HomeWorkListCard extends StatelessWidget {
   const HomeWorkListCard({Key key, this.mHomework_model}) : super(key: key);
   final HomeWorkListModel mHomework_model;
@@ -40,17 +42,35 @@ class HomeWorkListCard extends StatelessWidget {
                       children: [
                         new Expanded(
                           child: new Container(
-                              child: new Image(image: NetworkImage(url))),
+                              child: new Image(image: NetworkImage(ApiContent.PREF_IMAGES_PATH +mHomework_model.filePath))),
                           flex: 2,
                         ),
                         new Expanded(
                           child: new Container(
-                              margin: EdgeInsets.only(top: 12),
-                              child: new Text(
-                                mHomework_model.title,
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.black),
-                              )),
+                            margin: EdgeInsets.only(top: 12),
+                            child: Column(
+                              children: [
+                                 new Text(
+                                  mHomework_model.title,
+                                  style: TextStyle(
+                                      fontSize: 21,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'intel',
+                                      decoration: TextDecoration.none),
+                                ), new Text(
+                                  mHomework_model.description,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'intel',
+                                      decoration: TextDecoration.none),
+                                )
+                              ],
+                            )
+
+                             ),
                           flex: 1,
                         ),
                       ]),

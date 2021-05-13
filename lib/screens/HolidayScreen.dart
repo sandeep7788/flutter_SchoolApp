@@ -66,11 +66,11 @@ class _ScreenCalendarState extends State<HolidayScreem> {
       } else {
         CustomToast.show(ApiContent.something_wrong, context);
         Util().showMessageDialog(
-            context, ApiContent.something_wrong, ApiContent.try_later);
+            context, ApiContent.something_wrong, ApiContent.try_later,false);
       }
     } else {
       Util().showMessageDialog(
-          context, ApiContent.something_wrong, ApiContent.try_later);
+          context, ApiContent.something_wrong, ApiContent.try_later,false);
     }
   }
 
