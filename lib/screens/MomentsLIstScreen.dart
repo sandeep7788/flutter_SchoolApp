@@ -30,12 +30,8 @@ class MomentsListScreen extends StatefulWidget {
 }
 
 class _MomentsListScreen extends State<MomentsListScreen> {
-
   Future getMomentsList(BuildContext context, bool showDialog) async {
-
-
-      // ProcessDialog().showProgressDialog(context, "Please wait ...");
-
+    // ProcessDialog().showProgressDialog(context, "Please wait ...");
 
     var school_id = await SharedPreferencesClass.get(ApiContent.PREF_school_id);
     var facultyid = await SharedPreferencesClass.get(ApiContent.PREF_facultyid);
@@ -64,10 +60,11 @@ class _MomentsListScreen extends State<MomentsListScreen> {
     } else {
       CustomDialog("Somethong wrong", "Somethong wrong Somethong wrong");
     }
-      // Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
-  void openDialogImageDetails(String image_url, String image_title,String image_description) {
+  void openDialogImageDetails(
+      String image_url, String image_title, String image_description) {
     Navigator.of(context).push(new MaterialPageRoute<Null>(
         builder: (BuildContext context) {
           return Container(
@@ -87,6 +84,11 @@ class _MomentsListScreen extends State<MomentsListScreen> {
               ),
               Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Container(
+                  height: 6,
+                  color: Colors.blue,
+                  width: double.infinity,
+                ),
+                Container(
                     width: double.infinity,
                     color: Colors.white,
                     padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
@@ -100,20 +102,21 @@ class _MomentsListScreen extends State<MomentsListScreen> {
                           fontSize: 16,
                           fontFamily: "intel",
                           fontWeight: FontWeight.bold),
-                    )),                Container(
+                    )),
+                Container(
                     width: double.infinity,
                     color: Colors.white,
                     padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 12.0),
                     child: Text(
-                      image_description,
-                      maxLines: 5,
+                      image_description+"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 12,
-                          fontFamily: "intel",
-                          fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.none),
+                        color: Colors.black87,
+                        fontSize: 12,
+                        fontFamily: "intel",
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
+                      ),
                     )),
               ]),
             ]),
@@ -179,7 +182,8 @@ class _MomentsListScreen extends State<MomentsListScreen> {
             openDialogImageDetails(
                 ApiContent.PREF_IMAGES_PATH +
                     _listMomentListModel[index].filePath,
-                _listMomentListModel[index].title,_listMomentListModel[index].description)
+                _listMomentListModel[index].title,
+                _listMomentListModel[index].description)
           },
           child: Card(
             elevation: 4,

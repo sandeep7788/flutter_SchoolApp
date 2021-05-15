@@ -37,12 +37,12 @@ import '../Dashboard.dart';
 
 GlobalKey<FormState> _key = new GlobalKey();
 bool _validate = false;
-File _image;
-String userName = "user name";
-String emailID = "user@gmail.com";
-String phoneNo = "1234567890";
-String address = "jaipur rajasthan";
-String profileImage = "";
+String userName = "";
+String emailID = "";
+String phoneNo = "";
+String address = "";
+String profileImageUrl = "";
+File profileImage;
 bool isEditable = false;
 
 TextEditingController _teacherName = TextEditingController();
@@ -59,7 +59,7 @@ class AccountSetting extends StatefulWidget {
 
 class _AccountSetting extends State<AccountSetting> {
   updateProfile(BuildContext context) async {
-    ProcessDialog().showProgressDialog(context, "Please wait ...");
+    // ProcessDialog().showProgressDialog(context, "Please wait ...");
     log.fine("res.body");
     var request = http.MultipartRequest(
         'POST', Uri.parse(ApiContent.PREF_POST_INSERT_MOMENT));
@@ -70,7 +70,9 @@ class _AccountSetting extends State<AccountSetting> {
         await SharedPreferencesClass.get(ApiContent.PREF_userid);
     request.fields['address'] = _teacherAddress.text;
 
-    request.files.add(await http.MultipartFile.fromPath('file', _image.path));
+    profileImage!=null?request.files
+        .add(await http.MultipartFile.fromPath('file', profileImage.path)):null;
+
     var response = await request.send();
     log.fine(response.stream.toString());
     log.fine(response.statusCode.toString());
@@ -94,7 +96,7 @@ class _AccountSetting extends State<AccountSetting> {
   }
 
   getProfile(BuildContext context) async {
-    // ProcessDialog().showProgressDialog(context, "Please wait ...");
+    ProcessDialog().showProgressDialog(context, "Please wait ...");
 
     final body = {
       ApiContent.PREF_school_id:
@@ -103,12 +105,17 @@ class _AccountSetting extends State<AccountSetting> {
           await SharedPreferencesClass.get(ApiContent.PREF_userid),
     };
 
-    var schoolId=await SharedPreferencesClass.get(ApiContent.PREF_school_id);
-    var userId=await SharedPreferencesClass.get(ApiContent.PREF_userid);
-    userName=await SharedPreferencesClass.get(ApiContent.PREF_name);
+    var schoolId = await SharedPreferencesClass.get(ApiContent.PREF_school_id);
+    var userId = await SharedPreferencesClass.get(ApiContent.PREF_userid);
+    userName = await SharedPreferencesClass.get(ApiContent.PREF_name);
 
-    log.fine(ApiContent.PREF_GET_TEACHER_PROFILE+"?"+ApiContent.PREF_school_id+"=$schoolId"+"&"+ApiContent.PREF_userid+"=$userId");
-    var uri = Uri.parse(ApiContent.PREF_GET_TEACHER_PROFILE+"?"+ApiContent.PREF_school_id+"=$schoolId"+"&"+ApiContent.PREF_userid+"=$userId");
+    var uri = Uri.parse(ApiContent.PREF_GET_TEACHER_PROFILE +
+        "?" +
+        ApiContent.PREF_school_id +
+        "=$schoolId" +
+        "&" +
+        ApiContent.PREF_userid +
+        "=$userId");
 
     var response = await http.get(
       uri,
@@ -117,9 +124,9 @@ class _AccountSetting extends State<AccountSetting> {
       },
     );
 
-    log.fine("message"+response.body);
+    log.fine("message" + response.body);
 
-    // Navigator.pop(context);
+    Navigator.pop(context);
 
     if (response.statusCode == 200) {
       List<dynamic> list = json.decode(response.body);
@@ -132,7 +139,7 @@ class _AccountSetting extends State<AccountSetting> {
           emailID = _AccountDetailsModel.email;
           address = _AccountDetailsModel.address;
           phoneNo = _AccountDetailsModel.phonenumber;
-          profileImage = _AccountDetailsModel.profileimage;
+          profileImageUrl = _AccountDetailsModel.profileimage;
         });
       } else {
         CustomToast.show(ApiContent.something_wrong, context);
@@ -151,7 +158,7 @@ class _AccountSetting extends State<AccountSetting> {
         source: ImageSource.camera, imageQuality: 50));
 
     setState(() {
-      _image = image;
+      profileImage = image;
     });
   }
 
@@ -160,7 +167,7 @@ class _AccountSetting extends State<AccountSetting> {
         source: ImageSource.gallery, imageQuality: 50));
 
     setState(() {
-      _image = image;
+      profileImage = image;
     });
   }
 
@@ -195,21 +202,23 @@ class _AccountSetting extends State<AccountSetting> {
 
   @override
   Widget build(BuildContext context) {
-
     getProfile(context);
 
     return MaterialApp(
         home: Scaffold(
-            bottomNavigationBar: BottomAppBar(
-              color: Colors.transparent,
-              child: GestureDetector(
-                onTap: () {
-                  _sendToServer(context);
-                },
-                child: widgetCustomButton("Update profile", context),
-              ),
-              elevation: 0,
-            ),
+            bottomNavigationBar: isEditable == true
+                ? BottomAppBar(
+                    color: Colors.transparent,
+                    child: GestureDetector(
+                      onTap: () {
+                        _sendToServer(context);
+                        isEditable = true;
+                      },
+                      child: widgetCustomButton("Update profile", context),
+                    ),
+                    elevation: 0,
+                  )
+                : null,
             appBar: AppBar(
               title: Text("Teacher Profile"),
               leading: IconButton(
@@ -218,34 +227,22 @@ class _AccountSetting extends State<AccountSetting> {
                   Util().navigateToBack(context);
                 },
               ),
-              actions: <Widget>[
-                Visibility(
-                  visible: !isEditable,
-                  child: IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        setState(() {
-                          isEditable = true;
-                        });
-                      }),
-                )
-              ],
               centerTitle: true,
             ),
             body: profileUi(context)));
   }
 
   Widget profileUi(BuildContext context) {
-    return new Center(
-      child: new SingleChildScrollView(
-        child: new Container(
-          margin: new EdgeInsets.all(20.0),
+    return new SingleChildScrollView(
+      child: new Container(
+        margin: new EdgeInsets.all(20.0),
+        child: Form(
+          key: _key,
+          autovalidate: _validate,
           child: Center(
-            child: new Form(
-              key: _key,
-              autovalidate: _validate,
-              child: _getFormUI(context),
-            ),
+            child: isEditable == false
+                ? _userStatisDetails(context)
+                : _userEditableUi(context),
           ),
         ),
       ),
@@ -255,7 +252,8 @@ class _AccountSetting extends State<AccountSetting> {
   @override
   Future<void> initState() {
     super.initState();
-    // setProfileData();
+    isEditable = false;
+    setProfileData();
   }
 
   setProfileData() async {
@@ -276,128 +274,162 @@ class _AccountSetting extends State<AccountSetting> {
         });
   }
 
-  Widget _userImage(BuildContext context) {
+  Widget _userStatisDetails(BuildContext context) {
     return Stack(children: [
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(top: 48),
-              height: 300,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 60,
-                  ),
-                  Text(
-                    userName,
-                    style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'intel'),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    "Email ID: " + emailID,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontFamily: 'intel'),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    "Phone No: " + phoneNo,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontFamily: 'intel'),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Text(
-                    "Address: " + address,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
-                        fontFamily: 'intel'),
-                  ),
-                  new Expanded(
-                      child: new Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Card(
-                            margin: EdgeInsets.only(
-                                bottom: 24, right: 80, left: 80),
-                            shadowColor: Colors.white,
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 12.0, horizontal: 16),
-                              child: Text(
-                                "Edit Profile",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                    fontFamily: 'intel'),
+          Card(
+            margin: EdgeInsets.only(top: 100),
+            elevation: 8,
+            shadowColor: Colors.blue,
+            color: Colors.blue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Container(
+                width: double.infinity,
+                height: 300,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 60,
+                    ),
+                    Text(
+                      userName,
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontFamily: 'intel'),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      "Email ID: " + emailID,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          fontFamily: 'intel'),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      "Phone No: " + phoneNo,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          fontFamily: 'intel'),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      "Address: " + address,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          fontFamily: 'intel'),
+                    ),
+                    new Expanded(
+                        child: new Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Card(
+                              margin: EdgeInsets.only(
+                                  bottom: 24, right: 80, left: 80),
+                              shadowColor: Colors.white,
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                            ),
-                          )))
-                ],
-              )),
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 12.0, horizontal: 16),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        isEditable = true;
+                                      });
+                                    },
+                                    child: Text(
+                                      "Edit Profile",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue,
+                                          fontFamily: 'intel'),
+                                    ),
+                                  )),
+                            )))
+                  ],
+                )),
+          ),
         ],
       ),
-      Align(
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            child: CircleAvatar(
-              radius: 50.0,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    radius: 12.0,
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 15.0,
-                      color: Color(0xFF404040),
-                    ),
-                  ),
-                ),
-                radius: 48.0,
-                backgroundImage: AssetImage('assets/photo.png'),
-              ),
-            ),
-          )),
+      _userProfileImage(context),
     ]);
   }
 
-  Widget _getFormUI(BuildContext context) {
+  _userProfileImage(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Visibility(
+            visible: isEditable,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _showBottomSheet(context);
+                });
+              },
+              child: Container(
+                height: 50,
+                width: 50,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(width: 2, color: Colors.white)),
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        height: 150,
+        width: 150,
+        padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(width: 5, color: Colors.blueAccent),
+          color: Colors.blue,
+          image: DecorationImage(
+              image: profileImage != null
+                  ? FileImage(profileImage)
+                  : NetworkImage(ApiContent.PREF_IMAGES_PATH + profileImageUrl),
+              fit: BoxFit.cover),
+        ),
+      ),
+    );
+  }
+
+  Widget _userEditableUi(BuildContext context) {
     return Center(
       child: new Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Center(
-            child: _userImage(context),
+            child: _userProfileImage(context),
           ),
           new SizedBox(height: 50.0),
           new TextFormField(
@@ -460,10 +492,6 @@ class _AccountSetting extends State<AccountSetting> {
     );
   }
 
-  _sendToRegisterPage() {
-    ///Go to register page
-  }
-
   _sendToServer(BuildContext context) {
     if (_key.currentState.validate()) {
       _key.currentState.save();
@@ -477,8 +505,3 @@ class _AccountSetting extends State<AccountSetting> {
     }
   }
 }
-/* add staff member
-* '*' add all screen
-* '*'
-* upload clinic
-* */

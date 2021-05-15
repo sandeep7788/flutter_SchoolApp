@@ -11,6 +11,7 @@ import 'package:flutter_applicationdemo08/screens/HolidayScreen.dart';
 import 'package:flutter_applicationdemo08/screens/HomeworkListScreeen.dart';
 import 'package:flutter_applicationdemo08/screens/LeaveRequest.dart';
 import 'package:flutter_applicationdemo08/screens/MomentsLIstScreen.dart';
+import 'package:flutter_applicationdemo08/screens/NotificationListScreen.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'APIContent.dart';
 import 'model/Choice.dart';
@@ -25,10 +26,10 @@ class Dashboard extends StatefulWidget {
 
 Widget _mainAppBar(BuildContext context, String str_teachername) {
   return Container(
-    height: 180.0,
+    height: 220.0,
     color: Colors.blue,
     child: Container(
-      margin: EdgeInsets.only(left: 25, bottom: 16),
+      margin: EdgeInsets.only(left: 32, bottom: 16,top: 16),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -97,11 +98,6 @@ class _Dashboard extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        brightness: Brightness.dark,
-        backgroundColor: Colors.blue,
-      ),
       body: Container(
         color: Colors.blue,
         child: ListView(
@@ -152,6 +148,8 @@ class _Dashboard extends State<Dashboard> {
                       {Util().navigateToNextScreen(context, AttandenceScreen())}
                     else if (index == 3)
                       {Util().navigateToNextScreen(context, LeaveRequest())}
+                    else if (index == 7)
+                      {Util().navigateToNextScreen(context, NotificationListScreen())}
                     else if (index == 8)
                       {Util().navigateToNextScreen(context, AccountSetting())}
                   },

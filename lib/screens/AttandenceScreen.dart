@@ -54,11 +54,16 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
       "school_session":
           await SharedPreferencesClass.get(ApiContent.PREF_school_session)
     };
+    log.fine("message "+json.encode(body));
+
     final headers = {HttpHeaders.contentTypeHeader: 'application/json'};
     var uri = Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_STUDENT_ATTENDANCE, body);
 
     var response = await http.post(uri, headers: headers);
     Navigator.pop(context);
+
+    log.fine("message"+" "+response.body);
+
     if (response.statusCode == 200) {
       CustomDialog(
           "Submitted Sussfully", "Submitted Sussfully Submitted Sussfully");
