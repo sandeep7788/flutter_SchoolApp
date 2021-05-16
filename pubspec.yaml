@@ -34,6 +34,9 @@ dependencies:
   flutter_calendar_carousel: 1.5.0
   table_calendar: ^2.2.1
   flutter_staggered_grid_view: 0.3.0
+  connectivity_widget: ^0.1.7
+  flushbar: ^1.10.4
+  connectivity: ^0.3.2
 
 dev_dependencies:
   flutter_test:

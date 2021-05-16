@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
@@ -22,31 +23,35 @@ class _Splash extends State<Splash> {
         backgroundColor: Colors.blueAccent,
       ),
       backgroundColor: Colors.blueAccent,
-      body: Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              child: Image.asset(
-                'assets/logo.png',
-                width: 200,
-              ),
+      body: ConnectivityWidget(
+        builder: (context, isOnline) => Center(
+          child: Container(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/logo.png',
+                    width: 200,
+                  ),
+                ),
+                Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "School",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontFamily: "intel",
+                          fontWeight: FontWeight.w700),
+                    )),
+              ],
             ),
-            Container(
-                alignment: Alignment.center,
-                child: Text(
-                  "School",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontFamily: "intel",
-                      fontWeight: FontWeight.w700),
-                )),
-          ],
+            /*  */
+          ),
         ),
-        /*  */
       ),
     );
   }

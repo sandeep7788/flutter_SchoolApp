@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/common_widget/CustomDialog.dart';
@@ -136,12 +137,16 @@ class _MomentsListScreen extends State<MomentsListScreen> {
           ),
           centerTitle: true,
         ),
-        body: RefreshIndicator(
-          onRefresh: () => getMomentsList(context, true),
-          child: Container(
-            color: Colors.blue,
-            child: ListView(
-              children: <Widget>[_imagesGridWidget(context)],
+        body: ConnectivityWidget(
+          builder: (context, isOnline) => Center(
+            child: RefreshIndicator(
+              onRefresh: () => getMomentsList(context, true),
+              child: Container(
+                color: Colors.blue,
+                child: ListView(
+                  children: <Widget>[_imagesGridWidget(context)],
+                ),
+              ),
             ),
           ),
         ),

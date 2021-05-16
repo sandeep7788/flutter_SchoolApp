@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
 import 'package:flutter_applicationdemo08/Dashboard.dart';
@@ -32,7 +33,8 @@ Future<SignUppModel> doSignUp(
     ApiContent.PREF_REMEMBER_TOKEN: " ",
   };
   final headers = {HttpHeaders.contentTypeHeader: 'application/json'};
-  var uri = Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_LOGIN, body);
+  var uri =
+      Uri.https(ApiContent.PREF_BASE_URL, ApiContent.PREF_GET_LOGIN, body);
   var response = await http.post(uri, headers: headers);
 
   Navigator.pop(context);
@@ -40,67 +42,82 @@ Future<SignUppModel> doSignUp(
     List<dynamic> list = json.decode(response.body);
 
     if (list.length > 0) {
-
       SignUppModel _SignUppModel = SignUppModel.fromJson(list[0]);
       print("@@@@" + _SignUppModel.name);
-      SharedPreferencesClass.save(ApiContent.PREF_userid,_SignUppModel.userid);
-      SharedPreferencesClass.save(ApiContent.PREF_login,_SignUppModel.login);
-      SharedPreferencesClass.save(ApiContent.PREF_name,_SignUppModel.name);
-      SharedPreferencesClass.save(ApiContent.PREF_facultyid,_SignUppModel.facultyid);
-      SharedPreferencesClass.save(ApiContent.PREF_image,_SignUppModel.image);
-      SharedPreferencesClass.save(ApiContent.PREF_class_teacher,_SignUppModel.classTeacher);
-      SharedPreferencesClass.save(ApiContent.PREF_school_id,_SignUppModel.schoolId);
-      SharedPreferencesClass.save(ApiContent.PREF_school_name,_SignUppModel.schoolName);
-      SharedPreferencesClass.save(ApiContent.PREF_school_session,_SignUppModel.schoolSession);
+      SharedPreferencesClass.save(ApiContent.PREF_userid, _SignUppModel.userid);
+      SharedPreferencesClass.save(ApiContent.PREF_login, _SignUppModel.login);
+      SharedPreferencesClass.save(ApiContent.PREF_name, _SignUppModel.name);
+      SharedPreferencesClass.save(
+          ApiContent.PREF_facultyid, _SignUppModel.facultyid);
+      SharedPreferencesClass.save(ApiContent.PREF_image, _SignUppModel.image);
+      SharedPreferencesClass.save(
+          ApiContent.PREF_class_teacher, _SignUppModel.classTeacher);
+      SharedPreferencesClass.save(
+          ApiContent.PREF_school_id, _SignUppModel.schoolId);
+      SharedPreferencesClass.save(
+          ApiContent.PREF_school_name, _SignUppModel.schoolName);
+      SharedPreferencesClass.save(
+          ApiContent.PREF_school_session, _SignUppModel.schoolSession);
       SharedPreferencesClass.setLogin(true);
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboard()));
-
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Dashboard()));
     } else {
       CustomToast.show(ApiContent.something_wrong, context);
-      Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later,false);
+      Util().showMessageDialog(
+          context, ApiContent.something_wrong, ApiContent.try_later, false);
     }
   } else {
-    Util().showMessageDialog(context,ApiContent.something_wrong,ApiContent.try_later,false);
+    Util().showMessageDialog(
+        context, ApiContent.something_wrong, ApiContent.try_later, false);
   }
 }
 
 class _SignUp extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
+    ConnectivityUtils.initialize(
+        serverToPing:
+            "https://gist.githubusercontent.com/Vanethos/dccc4b4605fc5c5aa4b9153dacc7391c/raw/355ccc0e06d0f84fdbdc83f5b8106065539d9781/gistfile1.txt",
+        callback: (response) => response.contains("This is a test!"));
+
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.height * 0.40,
-                width: double.infinity,
-                color: Colors.blue,
+      body: ConnectivityWidget(
+        builder: (context, isOnline) => Center(
+          child: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.40,
+                    width: double.infinity,
+                    color: Colors.blue,
+                  ),
+                  Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 80),
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 19),
+                        ),
+                      )),
+                  Positioned(
+                    top: 150,
+                    left: 10,
+                    right: 10,
+                    child: LoginFormWidget(),
+                  )
+                ],
               ),
-              Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 80),
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 19),
-                    ),
-                  )),
-              Positioned(
-                top: 150,
-                left: 10,
-                right: 10,
-                child: LoginFormWidget(),
-              )
-            ],
+            ),
           ),
         ),
-      ),
+      )
     );
   }
 }
@@ -141,7 +158,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
               ],
             ),
           ),
-          _buildSignUp(),
+          // _buildSignUp(),
         ],
       ),
     );

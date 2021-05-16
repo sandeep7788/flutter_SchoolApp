@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -282,21 +283,26 @@ class _AddHomeworkScreen extends State<AttandenceScreen> {
             ),
             centerTitle: true,
           ),
-          body: Container(
-            color: Colors.white,
-            margin: EdgeInsets.only(left: 8, right: 8, top: 16),
-            child: Column(
-              children: [
-                widgetClassSectionButton(),
-                listAttandance.isNotEmpty
-                    ? headLineContainer()
-                    : msgNothingToShow(),
-                listAttandance.isNotEmpty
-                    ? widgetStudentList()
-                    : widgetMsgEmpty(),
-              ],
+          body: ConnectivityWidget(
+            builder: (context, isOnline) => Center(
+              child: Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(left: 8, right: 8, top: 16),
+                child: Column(
+                  children: [
+                    widgetClassSectionButton(),
+                    listAttandance.isNotEmpty
+                        ? headLineContainer()
+                        : msgNothingToShow(),
+                    listAttandance.isNotEmpty
+                        ? widgetStudentList()
+                        : widgetMsgEmpty(),
+                  ],
+                ),
+              ),
             ),
-          ));
+          )
+        );
     });
   }
 

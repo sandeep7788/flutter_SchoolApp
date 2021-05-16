@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/common_widget/CustomDialog.dart';
@@ -31,7 +32,6 @@ class NotificationListScreen extends StatefulWidget {
 }
 
 class _NotificationListScreen extends State<NotificationListScreen> {
-
   Future getNotification(BuildContext context) async {
     // ProcessDialog().showProgressDialog(context, "Please wait ...");
 
@@ -60,33 +60,35 @@ class _NotificationListScreen extends State<NotificationListScreen> {
         setState(() {});
       }
     } else {
-      CustomDialog(ApiContent.something_wrong,ApiContent.error_des);
+      CustomDialog(ApiContent.something_wrong, ApiContent.error_des);
     }
     // Navigator.pop(context);
   }
-
 
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(builder: (context, orientation) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("Notifications"),
-          iconTheme: IconThemeData(
-            color: Colors.white, //change your color here
-          ),
-          centerTitle: true,
-        ),
-        body: RefreshIndicator(
-          onRefresh: () => getNotification(context),
-          child: Container(
-            color: Colors.blue,
-            child: ListView(
-              children: <Widget>[_imagesGridWidget(context)],
+          appBar: AppBar(
+            title: Text("Notifications"),
+            iconTheme: IconThemeData(
+              color: Colors.white, //change your color here
             ),
+            centerTitle: true,
           ),
-        ),
-      );
+          body: ConnectivityWidget(
+            builder: (context, isOnline) => Center(
+              child: RefreshIndicator(
+                onRefresh: () => getNotification(context),
+                child: Container(
+                  color: Colors.blue,
+                  child: ListView(
+                    children: <Widget>[_imagesGridWidget(context)],
+                  ),
+                ),
+              ),
+            ),
+          ));
     });
   }
 
@@ -109,29 +111,31 @@ class _NotificationListScreen extends State<NotificationListScreen> {
             elevation: 4,
             margin: EdgeInsets.fromLTRB(0.0, 4.0, 4.0, 4.0),
             color: Colors.white70,
-            child: Stack(
-                children: <Widget>[
+            child: Stack(children: <Widget>[
               Center(
-                child: index<5?Icon(Icons.notifications_active_rounded, color: Colors.blue):Icon(Icons.notifications_sharp, color: Colors.blueGrey),
+                child: index < 5
+                    ? Icon(Icons.notifications_active_rounded,
+                        color: Colors.blue)
+                    : Icon(Icons.notifications_sharp, color: Colors.blueGrey),
               ),
               Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Container(
                     child: Text(
-                      _listNotifactionListModel[index].title,
-                      maxLines: 5,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.blueAccent,
-                          fontSize: 16,
-                          fontFamily: "intel",
-                          fontWeight: FontWeight.bold),
-                    )),
+                  _listNotifactionListModel[index].title,
+                  maxLines: 5,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 16,
+                      fontFamily: "intel",
+                      fontWeight: FontWeight.bold),
+                )),
               ]),
             ]),
           ),
         );
       },
-      staggeredTileBuilder: (index) => StaggeredTile.count(2,1),
+      staggeredTileBuilder: (index) => StaggeredTile.count(2, 1),
       //Make size as you want.
       mainAxisSpacing: 1.0,
       crossAxisSpacing: 1.0,

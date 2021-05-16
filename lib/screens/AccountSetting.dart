@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -205,31 +206,36 @@ class _AccountSetting extends State<AccountSetting> {
     getProfile(context);
 
     return MaterialApp(
-        home: Scaffold(
-            bottomNavigationBar: isEditable == true
-                ? BottomAppBar(
-                    color: Colors.transparent,
-                    child: GestureDetector(
-                      onTap: () {
-                        _sendToServer(context);
-                        isEditable = true;
-                      },
-                      child: widgetCustomButton("Update profile", context),
-                    ),
-                    elevation: 0,
-                  )
-                : null,
-            appBar: AppBar(
-              title: Text("Teacher Profile"),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: () {
-                  Util().navigateToBack(context);
-                },
-              ),
-              centerTitle: true,
-            ),
-            body: profileUi(context)));
+        home: ConnectivityWidget(
+          builder: (context, isOnline) => Center(
+            child: Scaffold(
+                bottomNavigationBar: isEditable == true
+                    ? BottomAppBar(
+                  color: Colors.transparent,
+                  child: GestureDetector(
+                    onTap: () {
+                      _sendToServer(context);
+                      isEditable = true;
+                    },
+                    child: widgetCustomButton("Update profile", context),
+                  ),
+                  elevation: 0,
+                )
+                    : null,
+                appBar: AppBar(
+                  title: Text("Teacher Profile"),
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                    onPressed: () {
+                      Util().navigateToBack(context);
+                    },
+                  ),
+                  centerTitle: true,
+                ),
+                body: profileUi(context)),
+          ),
+        )
+      );
   }
 
   Widget profileUi(BuildContext context) {

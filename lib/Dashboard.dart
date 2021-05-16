@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/helper/SharedPreferencesClass.dart';
@@ -29,7 +30,7 @@ Widget _mainAppBar(BuildContext context, String str_teachername) {
     height: 220.0,
     color: Colors.blue,
     child: Container(
-      margin: EdgeInsets.only(left: 32, bottom: 16,top: 16),
+      margin: EdgeInsets.only(left: 32, bottom: 16, top: 16),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -98,13 +99,17 @@ class _Dashboard extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.blue,
-        child: ListView(
-          children: <Widget>[
-            _mainAppBar(context, str_teachername),
-            sliverGridWidget(context)
-          ],
+      body: ConnectivityWidget(
+        builder: (context, isOnline) => Center(
+          child: Container(
+            color: Colors.blue,
+            child: ListView(
+              children: <Widget>[
+                _mainAppBar(context, str_teachername),
+                sliverGridWidget(context),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -136,20 +141,25 @@ class _Dashboard extends State<Dashboard> {
               onTap: () => {
                     if (index == 0)
                       {
-                        Util().navigateToNextScreen(context, HomeworkListScreeen())
+                        Util().navigateToNextScreen(
+                            context, HomeworkListScreeen())
                       }
                     else if (index == 1)
                       {Util().navigateToNextScreen(context, HolidayScreem())}
                     else if (index == 2)
                       {
-                        Util().navigateToNextScreen(context, MomentsListScreen())
+                        Util()
+                            .navigateToNextScreen(context, MomentsListScreen())
                       }
                     else if (index == 6)
                       {Util().navigateToNextScreen(context, AttandenceScreen())}
                     else if (index == 3)
                       {Util().navigateToNextScreen(context, LeaveRequest())}
                     else if (index == 7)
-                      {Util().navigateToNextScreen(context, NotificationListScreen())}
+                      {
+                        Util().navigateToNextScreen(
+                            context, NotificationListScreen())
+                      }
                     else if (index == 8)
                       {Util().navigateToNextScreen(context, AccountSetting())}
                   },

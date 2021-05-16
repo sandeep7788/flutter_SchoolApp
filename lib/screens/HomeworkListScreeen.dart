@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
@@ -90,7 +91,11 @@ class _AddHomeworkScreen extends State<HomeworkListScreeen> {
         ),
         centerTitle: true,
       ),
-      body: _homeWorkLisWidget(context),
+      body: ConnectivityWidget(
+        builder: (context, isOnline) => Center(
+          child: _homeWorkLisWidget(context),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add_to_photos, color: Colors.white),
           onPressed: () {

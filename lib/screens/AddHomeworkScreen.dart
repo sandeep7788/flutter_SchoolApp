@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:connectivity_widget/connectivity_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_applicationdemo08/APIContent.dart';
@@ -335,7 +336,11 @@ class _AddHomeworkScreen extends State<AddHomeworkScreen> {
           ),
           centerTitle: true,
         ),
-        body: _AddHomeworkUi(context),
+        body: ConnectivityWidget(
+          builder: (context, isOnline) => Center(
+            child: _AddHomeworkUi(context),
+          ),
+        ),
       );
     });
   }
